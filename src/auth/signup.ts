@@ -70,19 +70,48 @@ export function configSignupRoutes() {
             // Hash password
             const salt = await genSalt();
             const hashedPassword = await hash(body.password, salt);
+            const newUserID = generateID();
             // Insert user into database
             await psqlClient.query(
                 "INSERT INTO users (id, username, email, password)  VALUES ($1, $2, $3, $4)",
-                [generateID(), body.username, body.email, hashedPassword]
+                [newUserID, body.username, body.email, hashedPassword]
             );
+            const emailToken = generateToken();
+            await psqlClient.query("INSERT INTO email_verifications (id, token) VALUES ($1, $2)", [
+                newUserID,
+                emailToken
+            ]);
             sendEmail([body.email], "Confirm your nin0chat registration", "7111988", {
                 name: body.username,
-                confirm_url: `https://chat.nin0.dev/api/confirm?token=${generateToken()}`
+                confirm_url: `https://chat.nin0.dev/api/confirm?token=${emailToken}`
             });
             return reply.code(200).send({ success: true });
         } catch (e) {
             console.error(e);
             return reply.code(500).send({ error: "Internal Server Error" });
         }
+    });
+
+    server.get("/api/confirm", async function handler(request, reply) {
+        // Data validation
+        if (
+            // @ts-ignore
+            !request.query.token
+        ) {
+            return reply.code(400).send({ error: "Bad Request" });
+        }
+        // @ts-ignore
+        const token = request.query.token.replace(" ", "+");
+        // Check if token is valid
+        const query = await psqlClient.query("SELECT id FROM email_verifications WHERE token=$1", [
+            token
+        ]);
+        if (query.rows.length === 0) {
+            return reply.code(400).send({ error: "Invalid token" });
+        }
+        // Delete token
+        await psqlClient.query("DELETE FROM email_verifications WHERE token=$1", [token]);
+        await psqlClient.query("UPDATE users SET activated=true WHERE id=$1", [query.rows[0].id]);
+        return reply.redirect("https://chat.nin0.dev/login.html?confirmed=true");
     });
 }

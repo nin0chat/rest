@@ -7,5 +7,5 @@ export function generateID(): string {
 }
 
 export function generateToken(): string {
-    return randomBytes(60).toString("base64");
+    return randomBytes(60).toString("base64").replace("+", "");
 }
