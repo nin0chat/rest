@@ -33,7 +33,7 @@ export function configSignupRoutes() {
                 [body.username, body.email]
             );
             if (query.rows.length > 0) {
-                return reply.code(400).send({ error: "Email or username already exist" });
+                return reply.code(400).send({ error: "Email or username already exists" });
             }
             // Validate CAPTCHA
             let testMode = false;
