@@ -2,10 +2,14 @@
     "name": "nin0chat-rest",
     "main": "dist/index.js",
     "dependencies": {
-        "fastify": "^5.0.0"
+        "bcrypt": "^5.1.1",
+        "fastify": "^5.0.0",
+        "pg": "^8.13.0"
     },
     "devDependencies": {
+        "@types/bcrypt": "^5.0.2",
         "@types/node": "^22.7.7",
+        "@types/pg": "^8.11.10",
         "nodemon": "^3.1.7",
         "ts-node": "^10.9.2",
         "typescript": "^5.6.3"
