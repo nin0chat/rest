@@ -2,7 +2,7 @@ import test from "node:test";
 import { server } from "../server";
 import { psqlClient } from "../utils/database";
 import { config } from "../config";
-import { genSalt, hash } from "bcrypt";
+import { compare, genSalt, hash } from "bcrypt";
 import { generateID, generateToken } from "../utils/ids";
 import { checkForBannedWords } from "../utils/moderate";
 import { sendEmail } from "../utils/email";
@@ -113,5 +113,50 @@ export function configSignupRoutes() {
         await psqlClient.query("DELETE FROM email_verifications WHERE token=$1", [token]);
         await psqlClient.query("UPDATE users SET activated=true WHERE id=$1", [query.rows[0].id]);
         return reply.redirect("https://chat.nin0.dev/login.html?confirmed=true");
+    });
+
+    type SigninBody = {
+        email: string;
+        password: string;
+    };
+    server.post("/api/auth/login", async function handler(request, reply) {
+        try {
+            // Data validation
+            const body = request.body as SigninBody;
+            if (!body.email || !body.password || !body.email.match(/^.+@.+\..+$/)) {
+                return reply.code(400).send({ error: "Bad Request" });
+            }
+            // Check if user exists
+            const query = await psqlClient.query(
+                "SELECT id, password, activated FROM users WHERE email=$1",
+                [body.email]
+            );
+            if (query.rows.length === 0) {
+                await new Promise((r) => setTimeout(r, 3000));
+                return reply.code(403).send({ error: "Email or password are invalid" });
+            }
+            const verification = await compare(body.password, query.rows[0].password);
+            if (!verification) {
+                await new Promise((r) => setTimeout(r, 3000));
+                return reply.code(403).send({ error: "Email or password are invalid" });
+            }
+            if (!query.rows[0].activated) {
+                return reply.code(403).send({
+                    error: "Account is not activated, make sure that you confirmed the email"
+                });
+            }
+            // Generate token
+            const token = generateToken();
+            const salt = await genSalt();
+            const hashedToken = hash(token, salt);
+            await psqlClient.query("INSERT INTO tokens (id, token) VALUES ($1, $2)", [
+                query.rows[0].id,
+                hashedToken
+            ]);
+            return reply.code(200).send({ success: true, id: query.rows[0].id, token });
+        } catch (e) {
+            console.error(e);
+            return reply.code(500).send({ error: "Internal Server Error" });
+        }
     });
 }

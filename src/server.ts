@@ -1,7 +1,12 @@
 import Fastify from "fastify";
-import { configSignupRoutes } from "./auth/signup";
+import { configSignupRoutes } from "./routes/auth";
+import cors from "@fastify/cors";
 export const server = Fastify({
     logger: false
+});
+server.register(cors, {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"]
 });
 
 server.get("/api", async function handler(request, reply) {
