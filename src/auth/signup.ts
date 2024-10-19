@@ -3,8 +3,9 @@ import { server } from "../server";
 import { psqlClient } from "../utils/database";
 import { config } from "../config";
 import { genSalt, hash } from "bcrypt";
-import { generateID } from "../utils/ids";
+import { generateID, generateToken } from "../utils/ids";
 import { checkForBannedWords } from "../utils/moderate";
+import { sendEmail } from "../utils/email";
 
 export function configSignupRoutes() {
     type SignupBody = {
@@ -74,6 +75,10 @@ export function configSignupRoutes() {
                 "INSERT INTO users (id, username, email, password)  VALUES ($1, $2, $3, $4)",
                 [generateID(), body.username, body.email, hashedPassword]
             );
+            sendEmail([body.email], "Confirm your nin0chat registration", "7111988", {
+                name: body.username,
+                confirm_url: `https://chat.nin0.dev/api/confirm?token=${generateToken()}`
+            });
             return reply.code(200).send({ success: true });
         } catch (e) {
             console.error(e);
