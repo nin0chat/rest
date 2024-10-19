@@ -2,6 +2,7 @@
     "name": "nin0chat-rest",
     "main": "dist/index.js",
     "dependencies": {
+        "@fastify/cors": "^10.0.1",
         "bcrypt": "^5.1.1",
         "fastify": "^5.0.0",
         "pg": "^8.13.0"
