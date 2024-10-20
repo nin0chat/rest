@@ -4,6 +4,7 @@ import cors from "@fastify/cors";
 import { psqlClient } from "./utils/database";
 import { compare } from "bcrypt";
 import { configUserUpdateRoutes } from "./routes/userUpdate";
+import { configBotRoutes } from "./routes/devPortal";
 export const server = Fastify({
     logger: false
 });
@@ -56,6 +57,7 @@ server.get("/api", async function handler(request, reply) {
 
 configSignupRoutes();
 configUserUpdateRoutes();
+configBotRoutes();
 
 try {
     server.listen({ port: 3000 });
