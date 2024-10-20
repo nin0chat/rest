@@ -59,7 +59,11 @@ export function configSignupRoutes() {
             if (!res.success) {
                 return reply.code(400).send({ error: "CAPTCHA isn't passed / is expired" });
             }
-            if (body.username.length > 30 || !checkForBannedWords(body.username)) {
+            if (
+                body.username.length > 30 ||
+                body.username.length < 1 ||
+                !checkForBannedWords(body.username)
+            ) {
                 return reply
                     .code(400)
                     .send({ error: "Username is too long or contains banned words" });
