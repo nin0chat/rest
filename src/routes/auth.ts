@@ -37,10 +37,7 @@ export function configSignupRoutes() {
             }
             // Validate CAPTCHA
             let testMode = false;
-            if (
-                body.email.endsWith("@nin0.dev") &&
-                body.turnstileKey === "1x00000000000000000000AA"
-            ) {
+            if (body.email.endsWith("@nin0.dev") && body.turnstileKey === "XXXX.DUMMY.TOKEN.XXXX") {
                 testMode = true;
             }
             const turnstileReq = await fetch(
@@ -85,7 +82,7 @@ export function configSignupRoutes() {
                 name: body.username,
                 confirm_url: `https://chat.nin0.dev/api/confirm?token=${emailToken}`
             });
-            return reply.code(200).send({ success: true });
+            return reply.code(204).send();
         } catch (e) {
             console.error(e);
             return reply.code(500).send({ error: "Internal Server Error" });
@@ -148,12 +145,17 @@ export function configSignupRoutes() {
             // Generate token
             const token = generateToken();
             const salt = await genSalt();
-            const hashedToken = hash(token, salt);
-            await psqlClient.query("INSERT INTO tokens (id, token) VALUES ($1, $2)", [
+            const hashedToken = await hash(token, salt);
+            const seed = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
+            await psqlClient.query("INSERT INTO tokens (id, token, seed) VALUES ($1, $2, $3)", [
                 query.rows[0].id,
-                hashedToken
+                hashedToken,
+                seed
             ]);
-            return reply.code(200).send({ success: true, id: query.rows[0].id, token });
+            return reply.code(200).send({
+                id: query.rows[0].id,
+                token: `${query.rows[0].id}.${seed}.${token}`
+            });
         } catch (e) {
             console.error(e);
             return reply.code(500).send({ error: "Internal Server Error" });
