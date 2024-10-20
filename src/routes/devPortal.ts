@@ -95,7 +95,7 @@ export function configBotRoutes() {
                 "SELECT b.id, u.username FROM bots b JOIN users u ON b.id = u.id WHERE b.owner_id = $1",
                 [(request.params as any).dbUser.id]
             );
-            return reply.code(200).send(query.rows);
+            return reply.code(200).send({ bots: query.rows });
         } catch (e) {
             console.error(e);
             return reply.code(500).send({ error: "Internal Server Error" });
