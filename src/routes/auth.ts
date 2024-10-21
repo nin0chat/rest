@@ -84,7 +84,7 @@ export function configSignupRoutes() {
             ]);
             sendEmail([body.email], "Confirm your nin0chat registration", "7111988", {
                 name: body.username,
-                confirm_url: `https://chat.nin0.dev/api/confirm?token=${emailToken}`
+                confirm_url: `https://chatapi.nin0.dev/api/confirm?token=${emailToken}`
             });
             return reply.code(204).send();
         } catch (e) {

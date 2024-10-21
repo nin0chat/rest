@@ -60,7 +60,7 @@ configUserUpdateRoutes();
 configBotRoutes();
 
 try {
-    server.listen({ port: 3000 });
+    server.listen({ port: 5174 });
 } catch (err) {
     server.log.error(err);
     process.exit(1);
