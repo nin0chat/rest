@@ -14,7 +14,11 @@ server.register(cors, {
 });
 
 server.addHook("onRequest", async (request, reply) => {
-    if (!["/api", "/api/", "/api/auth/login", "/api/auth/signup"].includes(request.url)) {
+    if (
+        !["/api", "/api/", "/api/auth/login", "/api/auth/signup", "/api/confirm"].includes(
+            request.url
+        )
+    ) {
         // Request should be authenticated
         if (!request.headers.authorization) {
             return reply.code(401).send({ error: "Unauthorized" });
