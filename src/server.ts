@@ -18,7 +18,7 @@ server.addHook("onRequest", async (request, reply) => {
         !["/api", "/api/", "/api/auth/login", "/api/auth/signup", "/api/confirm"].includes(
             request.url
         ) &&
-        !request.url.startsWith("/api/auth/confirm")
+        !request.url.startsWith("/api/confirm")
     ) {
         // Request should be authenticated
         if (!request.headers.authorization) {
