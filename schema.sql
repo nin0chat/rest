@@ -21,15 +21,11 @@ create table bots
         constraint bots_pk
             primary key,
     owner_id varchar(18) not null
-        constraint bots_users_id_fk
-            references users
 );
 
 create table tokens
 (
     id    varchar(18) not null
-        constraint tokens_users_id_fk
-            references users,
     token varchar     not null,
     seed  integer     not null
 );
@@ -40,8 +36,6 @@ create index tokens_id_seed_token_index
 create table email_verifications
 (
     id    varchar(18) not null
-        constraint email_verifications_users_id_fk
-            references users,
     token varchar     not null
 );
 
