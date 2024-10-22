@@ -24,22 +24,23 @@ export const bannedWords = [
     "boykisser",
     "rizz",
     "hawk tuah",
+    // "wi.ng",
     "retard",
     "faggot",
     "fag",
     "faggots",
     "fags",
-    "n*g",
-    "n*gg*",
-    "n*gg*r",
+    "n.+g",
+    "n.+gg.+",
+    "n.+gg.+r",
     "nigga",
     "nigger",
-    "niglet"
-];
+    "niglet",
+].map((word) => /* compile regexp on startup instead of every request */ new RegExp(word));
 
 export function checkForBannedWords(text: string): boolean {
     for (const word of bannedWords) {
-        if (text.includes(word)) return false;
+        if (word.test(text)) return false;
     }
     return true;
 }
