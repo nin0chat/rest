@@ -5,7 +5,10 @@ import { STATUS_CODES } from "http";
 import type { Argument } from "./types.js";
 
 export class RESTError extends Error {
-    constructor(public statusCode: number, public message: string) {
+    constructor(
+        public statusCode: number,
+        public message: string
+    ) {
         super(message);
     }
 
@@ -26,7 +29,7 @@ export const errorHandler: Argument<FastifyInstance["setErrorHandler"], 0> = fun
 
     let message =
         // @ts-ignore
-        error.message ?? error.statusCode
+        (error.message ?? error.statusCode)
             ? // @ts-ignore
               STATUS_CODES[error.statusCode]
             : "Internal Server Error";

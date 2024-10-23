@@ -7,7 +7,9 @@ export async function sendEmail(
 ) {
     console.log(`Sending email to ${to} with ${bcc} with template ${template_id}`);
 
-    if (process.env.NODE_ENV === "development" && !process.env.SMTP2GO_KEY) { return; }
+    if (process.env.NODE_ENV === "development" && !process.env.SMTP2GO_KEY) {
+        return;
+    }
 
     const q = await fetch("https://api.smtp2go.com/v3/email/send", {
         method: "POST",

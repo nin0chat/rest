@@ -35,7 +35,7 @@ export const bannedWords = [
     "n.+gg.+r",
     "nigga",
     "nigger",
-    "niglet",
+    "niglet"
 ].map((word) => /* compile regexp on startup instead of every request */ new RegExp(word));
 
 export function checkForBannedWords(text: string): boolean {

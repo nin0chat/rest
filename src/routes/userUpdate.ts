@@ -2,8 +2,8 @@ import { compare, genSalt, hash } from "bcrypt";
 import { psqlClient } from "../lib/database";
 import { server } from "../server";
 import { checkForBannedWords } from "../utils/moderate";
-import { getUser } from '../lib/auth.js';
-import { RESTError } from '../lib/error.js';
+import { getUser } from "../lib/auth.js";
+import { RESTError } from "../lib/error.js";
 
 export function configUserUpdateRoutes() {
     type UserUpdateBody = {
@@ -11,19 +11,22 @@ export function configUserUpdateRoutes() {
         oldPassword?: string;
         newPassword?: string;
     };
-    server.patch("/api/user/update", {
-        schema: {
-            body: {
-                type: "object",
-                properties: {
-                    newUsername: { type: "string", minLength: 2, maxLength: 30 },
-                    oldPassword: { type: "string" },
-                    newPassword: { type: "string" }
+    server.patch(
+        "/api/user/update",
+        {
+            schema: {
+                body: {
+                    type: "object",
+                    properties: {
+                        newUsername: { type: "string", minLength: 2, maxLength: 30 },
+                        oldPassword: { type: "string" },
+                        newPassword: { type: "string" }
+                    }
                 }
             }
-        }
-    }, async function handler(request, reply) {
-        const user = await getUser(request);
+        },
+        async function handler(request, reply) {
+            const user = await getUser(request);
             const body = request.body as UserUpdateBody;
 
             if (body.newUsername) {
@@ -35,9 +38,7 @@ export function configUserUpdateRoutes() {
                 if (query.rowCount > 0) {
                     throw new RESTError(409, "Username already exists");
                 }
-                if (
-                    !checkForBannedWords(body.newUsername)
-                ) {
+                if (!checkForBannedWords(body.newUsername)) {
                     throw new RESTError(400, "Username contains banned words");
                 }
                 await psqlClient.query("UPDATE users SET username=$1 WHERE id=$2", [
@@ -62,5 +63,6 @@ export function configUserUpdateRoutes() {
                 ]);
             }
             return reply.code(204).send();
-    });
+        }
+    );
 }

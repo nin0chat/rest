@@ -4,6 +4,6 @@ const url = process.env.POSTGRES_URL;
 
 const { Client } = pg;
 export const psqlClient = new Client({
-    connectionString: url,
+    connectionString: url
 });
 psqlClient.connect();
